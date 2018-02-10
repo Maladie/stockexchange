@@ -20,7 +20,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "com")
+@EnableJpaRepositories(basePackages = "stockexchange.com")
 @ComponentScan(basePackages = "com")
 public class DatabaseConfig {
 

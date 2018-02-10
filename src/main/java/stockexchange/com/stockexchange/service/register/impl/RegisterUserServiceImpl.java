@@ -1,5 +1,6 @@
 package stockexchange.com.stockexchange.service.register.impl;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import stockexchange.com.stockexchange.service.login.LoginService;
 import stockexchange.com.stockexchange.service.register.RegisterResult;
 import stockexchange.com.stockexchange.service.register.RegisterUserService;
 
+
 @Service
 @Primary
 public class RegisterUserServiceImpl implements RegisterUserService {
@@ -19,11 +21,14 @@ public class RegisterUserServiceImpl implements RegisterUserService {
     private LoginService loginService;
     private UserRepository userRepository;
 
+    protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
+
     @Autowired
     public RegisterUserServiceImpl(UserFactory userFactory, LoginService loginService, UserRepository userRepository) {
         this.userFactory = userFactory;
         this.loginService = loginService;
         this.userRepository = userRepository;
+
     }
 
     @Override
@@ -32,15 +37,12 @@ public class RegisterUserServiceImpl implements RegisterUserService {
 
         if (validUsername) {
             User user = userFactory.createNewUser(newUserDto);
-            userRepository.persistUser(user);
-            System.out.println("=========================================================");
+            userRepository.save(user);
+            log.debug("User created succesfuly");
             System.out.println(" Registered as {" + user.getUsername() + "}");
-            System.out.println("=========================================================");
             return RegisterResult.SUCCESS;
         }
-        System.out.println("=========================================================");
-        System.out.println(" User login (" + newUserDto.getUsername() + ") already used!!! ");
-        System.out.println("=========================================================");
+        log.debug("User already in database");
         return RegisterResult.FAIL;
     }
 }

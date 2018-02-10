@@ -85,4 +85,13 @@ public class Stock {
         result = 31 * result + (price != null ? price.hashCode() : 0);
         return result;
     }
+
+    public static Stock fromDto(StockDto stockDto){
+        Stock stock = new Stock();
+        stock.setCode(stockDto.getCode());
+        stock.setName(stockDto.getName());
+        stock.setPrice(stockDto.getPrice());
+        stock.setUnit(stockDto.getUnit());
+        return stock;
+    }
 }

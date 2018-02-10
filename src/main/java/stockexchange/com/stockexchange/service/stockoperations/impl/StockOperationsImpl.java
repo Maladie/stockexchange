@@ -1,5 +1,6 @@
 package stockexchange.com.stockexchange.service.stockoperations.impl;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import stockexchange.com.stockexchange.exceptions.NotEnoughCashException;
@@ -11,12 +12,14 @@ import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class StockOperationsImpl implements StockOperations {
     private UserRepository userRepository;
     private StockRepository stockRepository;
+    protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     @Autowired
     public StockOperationsImpl(UserRepository userRepository, StockRepository stockRepository) {
@@ -25,24 +28,77 @@ public class StockOperationsImpl implements StockOperations {
     }
 
     @Override
-    public void buyStock(StockDto stockDto) {
+    public void buyStock(StockDto stockDto) throws NotEnoughCashException {
         User user = userRepository.findById(stockDto.getUserId());
-        try {
-            checkIfUserHasEnoughMoney(user.getCash(), stockDto);
-            Set<Stock> usersStock = user.getStocks();
-        } catch (NotEnoughCashException e) {
+        BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
+        if (!checkIfUserHasEnoughMoney(user.getCash(), totalPrice)) {
+            log.info("Not enough cash to buy " + stockDto.getName() + " by " + user.getUsername());
+            throw new NotEnoughCashException("Current cash was not enough to buy given amount of stock");
+        }
+        decreaseCashAmount(user, totalPrice);
+        addStockToUsersStocksWallet(user, stockDto);
+        log.info(stockDto.getUnit() + " " + stockDto.getName() + " bought by " + user.getUsername());
+        userRepository.save(user);
+    }
+
+    private void addStockToUsersStocksWallet(User user, StockDto stockDto) {
+        Set<Stock> stocks = user.getStocks();
+        Stock newStock = Stock.fromDto(stockDto);
+        Optional<Stock> optionalStock = stocks.stream().filter(newStock::equals).findFirst();
+        if(optionalStock.isPresent()){
+            Stock stock = optionalStock.get();
+            updatePrice(stock, newStock);
+        } else {
+            stocks.add(newStock);
         }
     }
 
-    private void checkIfUserHasEnoughMoney(BigDecimal cash, StockDto stockDto) throws NotEnoughCashException {
-        BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
-        if(cash.compareTo(totalPrice) > 0){
-            throw new NotEnoughCashException();
-        }
+    private void updatePrice(Stock stock, Stock newStock) {
+        BigDecimal currentStockPricePerUnit = stock.getPrice();
+        BigDecimal currentUnits = new BigDecimal(stock.getUnit());
+        BigDecimal currentStockTotalPrice = currentStockPricePerUnit.multiply(currentUnits);
+
+        BigDecimal addedStockPricePerUnit = newStock.getPrice();
+        BigDecimal addedUnits = new BigDecimal(newStock.getUnit());
+        BigDecimal addedStockTotalPrice = addedStockPricePerUnit.multiply(addedUnits);
+
+        BigDecimal totalUnitsAmount = currentUnits.add(addedUnits);
+        BigDecimal totalPrice = currentStockTotalPrice.add(addedStockTotalPrice);
+
+        BigDecimal totalPricePerUnit = totalPrice.divide(totalUnitsAmount);
+
+        stock.setUnit(totalUnitsAmount.longValue());
+        stock.setPrice(totalPricePerUnit);
+    }
+
+    private void increaseCashAmount(User user, BigDecimal totalPrice) {
+        BigDecimal usersCash = user.getCash();
+        user.setCash(usersCash.add(totalPrice));
+    }
+
+    private boolean checkIfUserHasEnoughMoney(BigDecimal cash, BigDecimal totalPrice) {
+        return (cash.compareTo(totalPrice) > 0);
     }
 
     @Override
     public void sellStock(StockDto stockDto) {
+        User user = userRepository.findById(stockDto.getUserId());
+        BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
+        increaseCashAmount(user, totalPrice);
+        decreaseStockUnitsHeld(user, stockDto);
+        log.info(stockDto.getUnit() + " " + stockDto.getName() + " sold by " + user.getUsername());
+        userRepository.save(user);
+    }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void decreaseStockUnitsHeld(User user, StockDto stockDto) {
+        Set<Stock> stocks = user.getStocks();
+        Stock soldStock = Stock.fromDto(stockDto);
+        Stock stock = stocks.stream().filter(soldStock::equals).findFirst().get();
+        stock.setUnit(stock.getUnit() - soldStock.getUnit());
+    }
+
+    private void decreaseCashAmount(User user, BigDecimal totalPrice) {
+        increaseCashAmount(user, totalPrice.negate());
     }
 }

@@ -1,6 +1,5 @@
 package stockexchange.com.stockexchange.model.factory.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import stockexchange.com.stockexchange.model.NewUserDto;
 import stockexchange.com.stockexchange.model.User;
@@ -18,7 +17,8 @@ public class BasicUserFactory implements UserFactory {
         User newUser = new User();
         newUser.setName(userDto.getName());
         newUser.setSurname(userDto.getSurname());
-        newUser.setWallet(userDto.getCash(), userDto.getCurrency());
+        newUser.setCash(userDto.getCash());
+        newUser.setCurrency(userDto.getCurrency());
         newUser.setStocks(Collections.emptySet());
         setUserPassword(newUser, userDto.getPassword());
         return newUser;

@@ -39,6 +39,10 @@ public class User {
     public User() {
     }
 
+    public void setCash(BigDecimal cash) {
+        wallet.cash = cash;
+    }
+
     @Embeddable
     private class Wallet {
         private BigDecimal cash;
@@ -113,14 +117,11 @@ public class User {
         return wallet.currency;
     }
 
-    public BigDecimal getCash(){
+    public BigDecimal getCash() {
         return wallet.cash;
     }
 
-    public void setWallet(BigDecimal cash, String currency) {
-        Wallet wallet = new Wallet();
-        wallet.cash = cash;
+    public void setCurrency(String currency) {
         wallet.currency = currency;
-        this.wallet = wallet;
     }
 }

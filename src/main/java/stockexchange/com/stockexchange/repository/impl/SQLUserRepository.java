@@ -16,4 +16,9 @@ public class SQLUserRepository implements UserRepository{
     public void persistUser(User user) {
 
     }
+
+    @Override
+    public User findById(Long id) {
+        return null;
+    }
 }

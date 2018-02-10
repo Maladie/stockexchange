@@ -12,19 +12,18 @@ import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class StockOperationsImpl implements StockOperations {
     private UserRepository userRepository;
-    private StockRepository stockRepository;
     protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public StockOperationsImpl(UserRepository userRepository, StockRepository stockRepository) {
+    public StockOperationsImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class StockOperationsImpl implements StockOperations {
         BigDecimal totalUnitsAmount = currentUnits.add(addedUnits);
         BigDecimal totalPrice = currentStockTotalPrice.add(addedStockTotalPrice);
 
-        BigDecimal totalPricePerUnit = totalPrice.divide(totalUnitsAmount);
+        BigDecimal totalPricePerUnit = totalPrice.divide(totalUnitsAmount, RoundingMode.HALF_DOWN);
 
         stock.setUnit(totalUnitsAmount.longValue());
         stock.setPrice(totalPricePerUnit);

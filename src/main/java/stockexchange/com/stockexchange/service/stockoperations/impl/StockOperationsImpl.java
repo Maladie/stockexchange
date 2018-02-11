@@ -8,6 +8,7 @@ import stockexchange.com.stockexchange.exceptions.NotEnoughStockException;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.model.StockDto;
 import stockexchange.com.stockexchange.model.User;
+import stockexchange.com.stockexchange.repository.StockRepository;
 import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 
@@ -19,11 +20,14 @@ import java.util.Set;
 @Service
 public class StockOperationsImpl implements StockOperations {
     private UserRepository userRepository;
+    private StockRepository stockRepository;
+
     protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public StockOperationsImpl(UserRepository userRepository) {
+    public StockOperationsImpl(UserRepository userRepository, StockRepository stockRepository) {
         this.userRepository = userRepository;
+        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -43,12 +47,15 @@ public class StockOperationsImpl implements StockOperations {
     private void addStockToUsersStocksWallet(User user, StockDto stockDto) {
         Set<Stock> stocks = user.getStocks();
         Stock newStock = Stock.fromDto(stockDto);
-        Optional<Stock> optionalStock = stocks.stream().filter(newStock::equals).findFirst();
+        Optional<Stock> optionalStock = stocks.stream().filter(stock -> stock.getName().equals(newStock.getName())).findFirst();
         if(optionalStock.isPresent()){
             Stock stock = optionalStock.get();
             updatePrice(stock, newStock);
+            stockRepository.save(stock);
         } else {
             stocks.add(newStock);
+            stockRepository.save(newStock);
+
         }
     }
 
@@ -82,7 +89,7 @@ public class StockOperationsImpl implements StockOperations {
     @Override
     public void sellStock(StockDto stockDto) throws NotEnoughStockException {
         User user = userRepository.findById(stockDto.getUserId());
-        if (checkIfUserHasEnoughStock(user.getStocks(), stockDto)) {
+        if (!checkIfUserHasEnoughStock(user.getStocks(), stockDto)) {
             throw new NotEnoughStockException("Current stock is less than amount user wants to sell");
         }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
@@ -99,10 +106,10 @@ public class StockOperationsImpl implements StockOperations {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void decreaseStockUnitsHeld(User user, StockDto stockDto) {
-        Set<Stock> stocks = user.getStocks();
-        Stock soldStock = Stock.fromDto(stockDto);
-        Stock stock = stocks.stream().filter(soldStock::equals).findFirst().get();
-        stock.setUnit(stock.getUnit() - soldStock.getUnit());
+        Set<Stock> stocks = user.getStocks();;
+        Stock stock = stocks.stream().filter(stock1 -> stock1.getName().equals(stockDto.getName())).findFirst().get();
+        stock.setUnit(stock.getUnit() - stockDto.getUnit());
+        stockRepository.save(stock);
     }
 
     private void decreaseCashAmount(User user, BigDecimal totalPrice) {

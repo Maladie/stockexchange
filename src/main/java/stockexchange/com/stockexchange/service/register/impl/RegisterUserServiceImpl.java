@@ -28,7 +28,6 @@ public class RegisterUserServiceImpl implements RegisterUserService {
         this.userFactory = userFactory;
         this.loginService = loginService;
         this.userRepository = userRepository;
-
     }
 
     @Override

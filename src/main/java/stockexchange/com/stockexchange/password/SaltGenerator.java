@@ -1,9 +1,6 @@
 package stockexchange.com.stockexchange.password;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 public class SaltGenerator {

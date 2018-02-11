@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import stockexchange.com.stockexchange.exceptions.NotEnoughCashException;
+import stockexchange.com.stockexchange.exceptions.NotEnoughStockException;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.model.StockDto;
 import stockexchange.com.stockexchange.model.User;
-import stockexchange.com.stockexchange.repository.StockRepository;
 import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 
@@ -80,13 +80,21 @@ public class StockOperationsImpl implements StockOperations {
     }
 
     @Override
-    public void sellStock(StockDto stockDto) {
+    public void sellStock(StockDto stockDto) throws NotEnoughStockException {
         User user = userRepository.findById(stockDto.getUserId());
+        if (checkIfUserHasEnoughStock(user.getStocks(), stockDto)) {
+            throw new NotEnoughStockException("Current stock is less than amount user wants to sell");
+        }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         increaseCashAmount(user, totalPrice);
         decreaseStockUnitsHeld(user, stockDto);
         log.info(stockDto.getUnit() + " " + stockDto.getName() + " sold by " + user.getUsername());
         userRepository.save(user);
+    }
+
+    private boolean checkIfUserHasEnoughStock(Set<Stock> stocks, StockDto stockDto) {
+        Optional<Stock> optionalStock = stocks.stream().filter(stock -> stock.getName().equals(stockDto.getName())).findFirst();
+        return optionalStock.filter(stock -> stock.getUnit() > stockDto.getUnit()).isPresent();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

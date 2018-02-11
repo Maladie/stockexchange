@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import stockexchange.com.stockexchange.exceptions.NotEnoughCashException;
+import stockexchange.com.stockexchange.exceptions.NotEnoughStockException;
 import stockexchange.com.stockexchange.model.StockDto;
 import stockexchange.com.stockexchange.model.Stocks;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
@@ -45,4 +46,13 @@ public class StockExchange {
         return ExchangeCode.SUCCESS;
     }
 
+    @RequestMapping(value = "/sell", method = RequestMethod.POST)
+    public ExchangeCode sellStocks(@RequestBody StockDto stockDto) {
+        try {
+            stockOperations.sellStock(stockDto);
+        } catch (NotEnoughStockException e) {
+            return ExchangeCode.SOLD_OUT;
+        }
+        return ExchangeCode.SUCCESS;
+    }
 }

@@ -37,6 +37,7 @@ public class User {
     private Wallet wallet;
 
     public User() {
+        wallet = new Wallet();
     }
 
     public void setCash(BigDecimal cash) {

@@ -17,6 +17,7 @@ public class BasicUserFactory implements UserFactory {
         User newUser = new User();
         newUser.setName(userDto.getName());
         newUser.setSurname(userDto.getSurname());
+        newUser.setUsername(userDto.getUsername());
         newUser.setCash(userDto.getCash());
         newUser.setCurrency(userDto.getCurrency());
         newUser.setStocks(Collections.emptySet());

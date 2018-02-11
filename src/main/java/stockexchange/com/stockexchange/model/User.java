@@ -34,6 +34,7 @@ public class User {
     @OneToMany
     private Set<Stock> stocks;
 
+    @Embedded
     private Wallet wallet;
 
     public User() {
@@ -41,21 +42,7 @@ public class User {
     }
 
     public void setCash(BigDecimal cash) {
-        wallet.cash = cash;
-    }
-
-    @Embeddable
-    private class Wallet {
-        private BigDecimal cash;
-        private String currency;
-
-        public Wallet() {
-        }
-
-        public Wallet(BigDecimal cash, String currency) {
-            this.cash = cash;
-            this.currency = currency;
-        }
+        wallet.setCash(cash);
     }
 
     public Long getId() {
@@ -115,14 +102,14 @@ public class User {
     }
 
     public String getCurrency() {
-        return wallet.currency;
+        return wallet.getCurrency();
     }
 
     public BigDecimal getCash() {
-        return wallet.cash;
+        return wallet.getCash();
     }
 
     public void setCurrency(String currency) {
-        wallet.currency = currency;
+        wallet.setCurrency(currency);
     }
 }

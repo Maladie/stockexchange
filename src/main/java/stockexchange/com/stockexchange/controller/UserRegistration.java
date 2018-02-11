@@ -14,7 +14,7 @@ import stockexchange.com.stockexchange.service.register.RegisterUserService;
 @RestController
 public class UserRegistration {
 
-    RegisterUserService registerUserService;
+    private RegisterUserService registerUserService;
 
     @Autowired
     public UserRegistration(RegisterUserService registerUserService) {

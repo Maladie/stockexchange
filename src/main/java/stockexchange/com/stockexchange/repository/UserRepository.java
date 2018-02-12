@@ -8,4 +8,5 @@ import stockexchange.com.stockexchange.model.User;
 public interface UserRepository extends JpaRepository<User, Long>{
     User findByUsername(String login);
     User findById(Long id);
+    User findByUsernameIgnoreCase(String username);
 }

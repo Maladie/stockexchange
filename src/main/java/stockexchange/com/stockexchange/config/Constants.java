@@ -6,6 +6,7 @@ public class Constants {
 
     public static final String HEADER_XSRF_AUTH_TOKEN = "X-XSRF-TOKEN";
     public static final String COOKIE_XSRF_AUTH_TOKEN = "XSRF-TOKEN";
+    public static final String USER_ID = "USER-ID";
     /**
      * 30 seconds in milliseconds
      */

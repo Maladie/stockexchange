@@ -57,10 +57,11 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
 
             ObjectMapper mapper = new ObjectMapper();
             try {
-                String body =request.getReader().lines().collect(Collectors.joining());
-                if(EmptyCheck.isNotNullOrEmpty(body)) {
-                    TypeReference<HashMap<String,String>> typeRef
-                            = new TypeReference<HashMap<String,String>>() {};
+                String body = request.getReader().lines().collect(Collectors.joining());
+                if (EmptyCheck.isNotNullOrEmpty(body)) {
+                    TypeReference<HashMap<String, String>> typeRef
+                            = new TypeReference<HashMap<String, String>>() {
+                    };
                     Map<String, String> s = mapper.readValue(body, typeRef);
                     username = s.get("username");
                     password = s.get("password");
@@ -145,17 +146,17 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
                     auth.setUser(user);
                     auth.setAuthenticated(true);
                     auth.setToken(token);
-                    logger.debug("User "+user.getUsername()+ " authentication success! Token: "+ token);
+                    logger.debug("User " + user.getUsername() + " authentication success! Token: " + token);
                     return auth;
                 } else {
                     info.setHttpStatusCode(101L);
                     info.setDesc("User not found. Invalid token.");
-                    logger.debug("User not found. Invalid token. Authentication failed! Token: "+ token);
+                    logger.debug("User not found. Invalid token. Authentication failed! Token: " + token);
                 }
             } catch (TokenException e) {
                 info.setHttpStatusCode(102L);
                 info.setDesc(e.getDescription());
-                logger.debug("TokenException "+info.getHttpStatusCode() + " "+ e.getDescription());
+                logger.debug("TokenException " + info.getHttpStatusCode() + " " + e.getDescription());
             } catch (Exception e) {
                 info.setHttpStatusCode(103L);
                 info.setDesc("AUTHENTICATE_EXCEPTION_RELOGIN_NEEDED");
@@ -166,7 +167,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
             info.setHttpStatusCode(100L);
             info.setDesc("Authorization Token not found");
             info.setInfoCode(APIInfoCodes.RELOGIN_NEEDED);
-            logger.debug("Authorization Token not found. Token value: "+ token);
+            logger.debug("Authorization Token not found. Token value: " + token);
         }
 
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
@@ -185,10 +186,10 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
         userToken.setToken(token);
         userToken.setStatus(TokenStatus.ACTIVE.getTokenStatus());
         userToken.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
-        //hopefully removes all tokens cached by user
-       Integer result = userTokenRepository.deactivateAllTokensByUser(user.getId());
-       logger.debug("Deactivation status: "+ result);
-        //apply all changes to db instantly
+
+        Integer result = userTokenRepository.deactivateAllTokensByUser(user.getId());
+        logger.debug("Deactivation status: " + result);
+
         userTokenRepository.flush();
         userTokenRepository.save(userToken);
         tokenHandlerService.insertToCache(token, user);
@@ -198,6 +199,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
         cookie.setHttpOnly(false);
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
+        response.addHeader(Constants.USER_ID, user.getId().toString());
         response.addHeader(Constants.HEADER_XSRF_AUTH_TOKEN, token);
         return userToken;
     }

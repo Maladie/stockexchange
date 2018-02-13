@@ -136,7 +136,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
 
         Info info = auth.getInfo();
 
-        if (EmptyCheck.isNotNullOrEmpty(token)) {
+        if (token != null) {
             try {
                 User user = tokenHandlerService.parseUserFromToken(token);
 
@@ -165,6 +165,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
         } else {
             info.setHttpStatusCode(100L);
             info.setDesc("Authorization Token not found");
+            info.setInfoCode(APIInfoCodes.RELOGIN_NEEDED);
             logger.debug("Authorization Token not found. Token value: "+ token);
         }
 

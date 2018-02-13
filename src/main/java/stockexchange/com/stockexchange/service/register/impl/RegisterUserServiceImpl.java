@@ -11,6 +11,7 @@ import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.login.LoginService;
 import stockexchange.com.stockexchange.service.register.RegisterResult;
 import stockexchange.com.stockexchange.service.register.RegisterUserService;
+import stockexchange.com.stockexchange.utils.EmptyCheck;
 
 
 @Service
@@ -32,9 +33,9 @@ public class RegisterUserServiceImpl implements RegisterUserService {
 
     @Override
     public RegisterResult register(NewUserDto newUserDto) {
-        boolean validUsername = loginService.isLoginFree(newUserDto.getUsername());
 
-        if (validUsername) {
+
+        if (validUsernameAndPassword(newUserDto)) {
             User user = userFactory.createNewUser(newUserDto);
             userRepository.save(user);
             log.debug("User created succesfuly");
@@ -43,5 +44,12 @@ public class RegisterUserServiceImpl implements RegisterUserService {
         }
         log.debug("User already in database");
         return RegisterResult.FAIL;
+    }
+
+    private boolean validUsernameAndPassword(NewUserDto newUserDto) {
+        String username = newUserDto.getUsername();
+        String pass = newUserDto.getPassword();
+
+        return EmptyCheck.isNotNullOrEmpty(pass) && EmptyCheck.isNotNullOrEmpty(username) && loginService.isLoginFree(username);
     }
 }

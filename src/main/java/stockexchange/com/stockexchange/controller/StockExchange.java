@@ -25,7 +25,7 @@ public class StockExchange {
         this.stockOperations = stockOperations;
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/stocks", method = RequestMethod.GET)
     public Stocks getStocks(){
         String resourceURL = "http://webtask.future-processing.com:8068/stocks";
         RestTemplate restTemplate = new RestTemplate();

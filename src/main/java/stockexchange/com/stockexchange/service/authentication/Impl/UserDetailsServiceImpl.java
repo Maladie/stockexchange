@@ -1,4 +1,4 @@
-package stockexchange.com.stockexchange.service.authentication;
+package stockexchange.com.stockexchange.service.authentication.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

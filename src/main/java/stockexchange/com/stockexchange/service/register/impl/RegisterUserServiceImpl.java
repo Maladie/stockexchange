@@ -47,6 +47,8 @@ public class RegisterUserServiceImpl implements RegisterUserService {
             return info;
         }
         log.debug("User already in database");
+        //TODO
+        info.setInfoCode(APIInfoCodes.INVALID_USERNAME);
         return info;
     }
 

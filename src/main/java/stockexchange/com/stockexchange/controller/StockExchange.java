@@ -16,6 +16,7 @@ import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 import java.util.Collections;
 
 @RestController
+@RequestMapping(value = "/api")
 public class StockExchange {
 
     private StockOperations stockOperations;
@@ -36,7 +37,7 @@ public class StockExchange {
         return exchange.getBody();
     }
 
-    @RequestMapping(value = "/api/buy", method = RequestMethod.POST)
+    @RequestMapping(value = "/buy", method = RequestMethod.POST)
     public ExchangeCode buyStocks(@RequestBody StockDto stockDto){
         try {
             stockOperations.buyStock(stockDto);
@@ -46,7 +47,7 @@ public class StockExchange {
         return ExchangeCode.SUCCESS;
     }
 
-    @RequestMapping(value = "/api/sell", method = RequestMethod.POST)
+    @RequestMapping(value = "/sell", method = RequestMethod.POST)
     public ExchangeCode sellStocks(@RequestBody StockDto stockDto) {
         try {
             stockOperations.sellStock(stockDto);

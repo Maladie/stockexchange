@@ -2,15 +2,14 @@ package stockexchange.com.stockexchange.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
-import java.util.TimeZone;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Stocks {
 
     private Set<Stock> items;
-    private LocalDateTime publicationDate;
+    private String publicationDate;
 
     public Stocks(Set<Stock> items) {
         this.items = items;
@@ -21,8 +20,9 @@ public class Stocks {
 
     public Stocks(Set<Stock> items, String publicationDate) {
         this.items = items;
-        this.publicationDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(publicationDate)),
-                TimeZone.getDefault().toZoneId());
+        this.publicationDate = Instant.parse("2014-09-11T21:28:29.429209Z")
+                        .atZone(ZoneId.of("Europe/Warsaw"))
+                        .format(DateTimeFormatter.ofPattern("MMM d uuuu hh:mm a z", Locale.ROOT));
     }
 
     public Set<Stock> getItems() {
@@ -33,11 +33,11 @@ public class Stocks {
         this.items = items;
     }
 
-    public LocalDateTime getPublicationDate() {
+    public String getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(LocalDateTime publicationDate) {
+    public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
     }
 }

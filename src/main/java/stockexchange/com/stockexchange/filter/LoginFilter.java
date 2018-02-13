@@ -48,12 +48,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
             token = tokenAuthenticationService.addAuthentication(response, authResultObject);
             System.out.println("Authentication SUCCESS. "+"UserId: " + authResultObject.getUser().getId()+ " token: "+ token.getToken());
 
-            // Add the authentication to the Security context
             SecurityContextHolder.getContext().setAuthentication(authResult);
-
-//            HashMap<String, Object> information = new HashMap<>();
-//            information.put("USER", authResultObject.getUser());
-//            information.put("INFO", authResultObject.getInfo());
 
             ObjectMapper mapper = new ObjectMapper();
             response.setCharacterEncoding("UTF-8");

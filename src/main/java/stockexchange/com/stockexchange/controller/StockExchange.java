@@ -36,7 +36,7 @@ public class StockExchange {
         return exchange.getBody();
     }
 
-    @RequestMapping(value = "/buy", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/buy", method = RequestMethod.POST)
     public ExchangeCode buyStocks(@RequestBody StockDto stockDto){
         try {
             stockOperations.buyStock(stockDto);
@@ -46,7 +46,7 @@ public class StockExchange {
         return ExchangeCode.SUCCESS;
     }
 
-    @RequestMapping(value = "/sell", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/sell", method = RequestMethod.POST)
     public ExchangeCode sellStocks(@RequestBody StockDto stockDto) {
         try {
             stockOperations.sellStock(stockDto);

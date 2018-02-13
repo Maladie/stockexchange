@@ -1,13 +1,16 @@
 package stockexchange.com.stockexchange.model;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class Stocks {
 
     private Set<Stock> items;
-    private Date publicationDate;
+    private LocalDateTime publicationDate;
 
     public Stocks(Set<Stock> items) {
         this.items = items;
@@ -18,7 +21,8 @@ public class Stocks {
 
     public Stocks(Set<Stock> items, String publicationDate) {
         this.items = items;
-        this.publicationDate = new Date(publicationDate);
+        this.publicationDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(publicationDate)),
+                TimeZone.getDefault().toZoneId());
     }
 
     public Set<Stock> getItems() {
@@ -29,11 +33,11 @@ public class Stocks {
         this.items = items;
     }
 
-    public Date getPublicationDate() {
+    public LocalDateTime getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(Date publicationDate) {
+    public void setPublicationDate(LocalDateTime publicationDate) {
         this.publicationDate = publicationDate;
     }
 }

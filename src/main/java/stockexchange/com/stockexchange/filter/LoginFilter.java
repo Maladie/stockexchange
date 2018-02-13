@@ -7,6 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Component;
 import stockexchange.com.stockexchange.config.ApplicationContextProvider;
 import stockexchange.com.stockexchange.exceptions.UserAuthenticationException;
 import stockexchange.com.stockexchange.info.Info;

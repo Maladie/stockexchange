@@ -185,7 +185,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
         userToken.setStatus(TokenStatus.ACTIVE.getTokenStatus());
         userToken.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
         //hopefully removes all tokens cached by user
-       int result = userTokenRepository.deactivateAllTokensByUser(user.getId());
+       Integer result = userTokenRepository.deactivateAllTokensByUser(user.getId());
        logger.debug("Deactivation status: "+ result);
         //apply all changes to db instantly
         userTokenRepository.flush();

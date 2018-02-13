@@ -16,7 +16,7 @@ import java.util.List;
 public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
     @Modifying
     @Query("update UserToken u set u.token = ?1, u.status = ?2 where u.id = ?3")
-    Integer updateUserTokenStatus(String token, TokenStatus status, Long id);
+    Integer updateUserTokenStatus(String token, TokenStatus status, Integer id);
 
     UserToken getByToken(String token);
 
@@ -28,7 +28,7 @@ public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
 
     @Modifying
     @Query("update UserToken u set u.status = 1 where u.id = ?1")
-    int deactivateAllTokensByUser(Long userId);
+    int deactivateAllTokensByUser(int userId);
 
     void deleteAllByStatus(Long status);
 }

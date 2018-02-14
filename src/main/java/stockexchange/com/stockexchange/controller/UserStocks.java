@@ -8,6 +8,7 @@ import stockexchange.com.stockexchange.config.Constants;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.service.user.UserStockService;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @RestController
@@ -20,8 +21,15 @@ public class UserStocks {
         this.userStockService = userStockService;
     }
 
-    @GetMapping(value = "/userStock")
+    @GetMapping(value = "/api/userstock")
     public Set<Stock> getUserStocks(@RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
         return userStockService.getStocks(token);
     }
+
+    @GetMapping(value = "/api/usercash")
+    public BigDecimal getUserCash(@RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
+        return userStockService.getCash(token);
+    }
+
+
 }

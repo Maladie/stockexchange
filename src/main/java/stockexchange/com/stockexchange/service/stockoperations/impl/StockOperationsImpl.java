@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class StockOperationsImpl implements StockOperations {
@@ -36,7 +37,6 @@ public class StockOperationsImpl implements StockOperations {
 
     @Override
     public Info buyStock(StockDto stockDto, String token) {
-        Info info = new Info();
         User user;
         try {
             user = tokenHandlerService.parseUserFromToken(token);
@@ -46,10 +46,7 @@ public class StockOperationsImpl implements StockOperations {
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         if (!checkIfUserHasEnoughMoney(user.getCash(), totalPrice)) {
             log.debug("Not enough cash to buy " + stockDto.getName() + " by " + user.getUsername());
-            info.setDesc("Current cash was not enough to buy given amount of stock");
-            info.setHttpStatusCode(400L);
-            info.setInfoCode(APIInfoCodes.LACK_OF_CASH);
-            return info;
+            return returnUnsucesfulInfo("Current cash was not enough to buy given amount of stock", APIInfoCodes.LACK_OF_CASH);
         }
         decreaseCashAmount(user, totalPrice);
         addStockToUsersStocksWallet(user, stockDto);
@@ -102,7 +99,6 @@ public class StockOperationsImpl implements StockOperations {
     @Override
     public Info sellStock(StockDto stockDto, String token) {
         User user;
-        Info info = new Info();
         try {
             user = tokenHandlerService.parseUserFromToken(token);
         } catch (TokenException e) {
@@ -110,10 +106,7 @@ public class StockOperationsImpl implements StockOperations {
         }
         if (!checkIfUserHasEnoughStock(user.getStocks(), stockDto)) {
             log.debug("Current stock is less than amount user: " + user.getUsername() + " wants to sell");
-            info.setDesc("Current stock is less than amount user wants to sell");
-            info.setHttpStatusCode(400L);
-            info.setInfoCode(APIInfoCodes.SOLD_OUT);
-            return info;
+            return returnUnsucesfulInfo("Current stock is less than amount user wants to sell", APIInfoCodes.SOLD_OUT);
         }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         increaseCashAmount(user, totalPrice);
@@ -142,6 +135,7 @@ public class StockOperationsImpl implements StockOperations {
 
     private Info returnInfoWhenTokenExceptionCatched(TokenException e) {
         Info info = new Info();
+        info.setKey(UUID.randomUUID().toString());
         info.setDesc("Token not found");
         info.setHttpStatusCode(400L);
         info.setInfoCode(APIInfoCodes.TOKEN_NOT_FOUND);
@@ -151,9 +145,19 @@ public class StockOperationsImpl implements StockOperations {
 
     private Info returnSuccesfulInfo(String description) {
         Info info = new Info();
+        info.setKey(UUID.randomUUID().toString());
         info.setDesc(description);
         info.setHttpStatusCode(200L);
         info.setInfoCode(APIInfoCodes.OK);
+        return info;
+    }
+
+    private Info returnUnsucesfulInfo(String description, APIInfoCodes code) {
+        Info info = new Info();
+        info.setKey(UUID.randomUUID().toString());
+        info.setDesc(description);
+        info.setHttpStatusCode(400L);
+        info.setInfoCode(APIInfoCodes.SOLD_OUT);
         return info;
     }
 

@@ -18,19 +18,19 @@ public class User implements UserDetails {
     private Integer id;
 
     @NotNull
-    @Size(min = 2)
+    @Size(max = 50)
     private String name;
 
     @NotNull
-    @Size(min = 2)
+    @Size(max = 50)
     private String surname;
 
     @NotNull
-    @Size(min = 1)
+    @Size(max = 50)
     private String username;
 
     @NotNull
-    @Size(min = 4)
+    @Size(max = 50)
     private String password;
 
     private String salt;

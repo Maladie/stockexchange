@@ -30,7 +30,7 @@ public class User implements UserDetails {
     private String username;
 
     @NotNull
-    @Size(max = 50)
+    @Size(max = 255)
     private String password;
 
     private String salt;

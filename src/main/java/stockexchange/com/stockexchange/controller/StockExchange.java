@@ -2,13 +2,10 @@ package stockexchange.com.stockexchange.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import stockexchange.com.stockexchange.exceptions.NotEnoughCashException;
-import stockexchange.com.stockexchange.exceptions.NotEnoughStockException;
+import stockexchange.com.stockexchange.config.Constants;
+import stockexchange.com.stockexchange.info.Info;
 import stockexchange.com.stockexchange.model.StockDto;
 import stockexchange.com.stockexchange.model.Stocks;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
@@ -38,22 +35,14 @@ public class StockExchange {
     }
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public ExchangeCode buyStocks(@RequestBody StockDto stockDto){
-        try {
-            stockOperations.buyStock(stockDto);
-        } catch (NotEnoughCashException e) {
-            return ExchangeCode.LACK_OF_CASH;
-        }
-        return ExchangeCode.SUCCESS;
+    public ResponseEntity<Info> buyStocks(@RequestBody StockDto stockDto, @RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
+        Info info = stockOperations.buyStock(stockDto, token);
+        return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/sell", method = RequestMethod.POST)
-    public ExchangeCode sellStocks(@RequestBody StockDto stockDto) {
-        try {
-            stockOperations.sellStock(stockDto);
-        } catch (NotEnoughStockException e) {
-            return ExchangeCode.SOLD_OUT;
-        }
-        return ExchangeCode.SUCCESS;
+    public ResponseEntity<Info> sellStocks(@RequestBody StockDto stockDto, @RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
+        Info info = stockOperations.sellStock(stockDto, token);
+        return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
     }
 }

@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface UserStockService {
 
-    Set<Stock> getStocks(Long userId);
+    Set<Stock> getStocks(String token);
 }

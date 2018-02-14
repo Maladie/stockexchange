@@ -63,13 +63,12 @@ public class Stock {
         this.price = price;
     }
 
-    public StockDto toDto(Long userId){
+    public StockDto toDto() {
         StockDto dto = new StockDto();
         dto.setName(name);
         dto.setCode(code);
         dto.setPrice(price);
         dto.setUnit(unit);
-        dto.setUserId(userId);
         return dto;
     }
 

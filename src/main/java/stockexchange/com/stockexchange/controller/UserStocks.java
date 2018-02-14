@@ -2,11 +2,12 @@ package stockexchange.com.stockexchange.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import stockexchange.com.stockexchange.config.Constants;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.service.user.UserStockService;
 
-import javax.servlet.http.HttpSession;
 import java.util.Set;
 
 @RestController
@@ -20,8 +21,7 @@ public class UserStocks {
     }
 
     @GetMapping(value = "/userStock")
-    public Set<Stock> getUserStocks(HttpSession session){
-        Long userId = Long.valueOf((String) session.getAttribute("userId"));
-        return userStockService.getStocks(userId);
+    public Set<Stock> getUserStocks(@RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
+        return userStockService.getStocks(token);
     }
 }

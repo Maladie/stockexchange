@@ -11,8 +11,6 @@ public class StockDto {
 
     private BigDecimal price;
 
-    private Long userId;
-
     public StockDto() {
     }
 
@@ -48,11 +46,4 @@ public class StockDto {
         this.price = price;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 }

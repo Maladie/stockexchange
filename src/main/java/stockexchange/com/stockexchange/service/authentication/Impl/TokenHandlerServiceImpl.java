@@ -37,7 +37,7 @@ public class TokenHandlerServiceImpl implements TokenHandlerService {
             } else if (userToken.getStatus() == TokenStatus.ACTIVE.getTokenStatus()) {
                 return (User) user;
             } else {
-                throw new TokenException(token, "TOKEN_IN_NOT_ACTIVE", null);
+                throw new TokenException(token, "TOKEN_IS_NOT_ACTIVE", null);
             }
         }
     }

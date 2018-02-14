@@ -3,13 +3,15 @@ package stockexchange.com.stockexchange.service.stockoperations.impl;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import stockexchange.com.stockexchange.exceptions.NotEnoughCashException;
-import stockexchange.com.stockexchange.exceptions.NotEnoughStockException;
+import stockexchange.com.stockexchange.exceptions.TokenException;
+import stockexchange.com.stockexchange.info.APIInfoCodes;
+import stockexchange.com.stockexchange.info.Info;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.model.StockDto;
 import stockexchange.com.stockexchange.model.User;
 import stockexchange.com.stockexchange.repository.StockRepository;
 import stockexchange.com.stockexchange.repository.UserRepository;
+import stockexchange.com.stockexchange.service.authentication.TokenHandlerService;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
 
 import java.math.BigDecimal;
@@ -21,27 +23,39 @@ import java.util.Set;
 public class StockOperationsImpl implements StockOperations {
     private UserRepository userRepository;
     private StockRepository stockRepository;
+    private TokenHandlerService tokenHandlerService;
 
     protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public StockOperationsImpl(UserRepository userRepository, StockRepository stockRepository) {
+    public StockOperationsImpl(UserRepository userRepository, StockRepository stockRepository, TokenHandlerService tokenHandlerService) {
         this.userRepository = userRepository;
         this.stockRepository = stockRepository;
+        this.tokenHandlerService = tokenHandlerService;
     }
 
     @Override
-    public void buyStock(StockDto stockDto) throws NotEnoughCashException {
-        User user = userRepository.findById(stockDto.getUserId());
+    public Info buyStock(StockDto stockDto, String token) {
+        Info info = new Info();
+        User user;
+        try {
+            user = tokenHandlerService.parseUserFromToken(token);
+        } catch (TokenException e) {
+            return returnInfoWhenTokenExceptionCatched(e);
+        }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         if (!checkIfUserHasEnoughMoney(user.getCash(), totalPrice)) {
-            log.info("Not enough cash to buy " + stockDto.getName() + " by " + user.getUsername());
-            throw new NotEnoughCashException("Current cash was not enough to buy given amount of stock");
+            log.debug("Not enough cash to buy " + stockDto.getName() + " by " + user.getUsername());
+            info.setDesc("Current cash was not enough to buy given amount of stock");
+            info.setHttpStatusCode(400L);
+            info.setInfoCode(APIInfoCodes.LACK_OF_CASH);
+            return info;
         }
         decreaseCashAmount(user, totalPrice);
         addStockToUsersStocksWallet(user, stockDto);
-        log.info(stockDto.getUnit() + " " + stockDto.getName() + " bought by " + user.getUsername());
+        log.debug(stockDto.getUnit() + " " + stockDto.getName() + " bought by " + user.getUsername());
         userRepository.save(user);
+        return returnSuccesfulInfo("Stock bought succesfuly");
     }
 
     private void addStockToUsersStocksWallet(User user, StockDto stockDto) {
@@ -55,7 +69,6 @@ public class StockOperationsImpl implements StockOperations {
         } else {
             stocks.add(newStock);
             stockRepository.save(newStock);
-
         }
     }
 
@@ -87,16 +100,27 @@ public class StockOperationsImpl implements StockOperations {
     }
 
     @Override
-    public void sellStock(StockDto stockDto) throws NotEnoughStockException {
-        User user = userRepository.findById(stockDto.getUserId());
+    public Info sellStock(StockDto stockDto, String token) {
+        User user;
+        Info info = new Info();
+        try {
+            user = tokenHandlerService.parseUserFromToken(token);
+        } catch (TokenException e) {
+            return returnInfoWhenTokenExceptionCatched(e);
+        }
         if (!checkIfUserHasEnoughStock(user.getStocks(), stockDto)) {
-            throw new NotEnoughStockException("Current stock is less than amount user wants to sell");
+            log.debug("Current stock is less than amount user: " + user.getUsername() + " wants to sell");
+            info.setDesc("Current stock is less than amount user wants to sell");
+            info.setHttpStatusCode(400L);
+            info.setInfoCode(APIInfoCodes.SOLD_OUT);
+            return info;
         }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         increaseCashAmount(user, totalPrice);
         decreaseStockUnitsHeld(user, stockDto);
         log.info(stockDto.getUnit() + " " + stockDto.getName() + " sold by " + user.getUsername());
         userRepository.save(user);
+        return returnSuccesfulInfo("Stock sold succesfuly");
     }
 
     private boolean checkIfUserHasEnoughStock(Set<Stock> stocks, StockDto stockDto) {
@@ -115,4 +139,22 @@ public class StockOperationsImpl implements StockOperations {
     private void decreaseCashAmount(User user, BigDecimal totalPrice) {
         increaseCashAmount(user, totalPrice.negate());
     }
+
+    private Info returnInfoWhenTokenExceptionCatched(TokenException e) {
+        Info info = new Info();
+        info.setDesc("Token not found");
+        info.setHttpStatusCode(400L);
+        info.setInfoCode(APIInfoCodes.TOKEN_NOT_FOUND);
+        log.debug("Token not found " + e);
+        return info;
+    }
+
+    private Info returnSuccesfulInfo(String description) {
+        Info info = new Info();
+        info.setDesc(description);
+        info.setHttpStatusCode(200L);
+        info.setInfoCode(APIInfoCodes.OK);
+        return info;
+    }
+
 }

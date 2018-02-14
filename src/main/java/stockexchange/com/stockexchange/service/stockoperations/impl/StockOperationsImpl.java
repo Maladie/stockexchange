@@ -40,6 +40,7 @@ public class StockOperationsImpl implements StockOperations {
         User user;
         try {
             user = tokenHandlerService.parseUserFromToken(token);
+            user = userRepository.findById(user.getId());
         } catch (TokenException e) {
             return returnInfoWhenTokenExceptionCatched(e);
         }
@@ -101,6 +102,7 @@ public class StockOperationsImpl implements StockOperations {
         User user;
         try {
             user = tokenHandlerService.parseUserFromToken(token);
+            user = userRepository.findById(user.getId());
         } catch (TokenException e) {
             return returnInfoWhenTokenExceptionCatched(e);
         }

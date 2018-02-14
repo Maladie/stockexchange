@@ -32,7 +32,7 @@ public class TokenHandlerServiceImpl implements TokenHandlerService {
         else {
             UserToken userToken = userTokenRepository.getByToken(token);
 
-            if(userToken ==null) {
+            if (userToken == null) {
                 throw new TokenException(token, "TOKEN_USER_MISMATCH", null);
             } else if (userToken.getStatus() == TokenStatus.ACTIVE.getTokenStatus()) {
                 return (User) user;

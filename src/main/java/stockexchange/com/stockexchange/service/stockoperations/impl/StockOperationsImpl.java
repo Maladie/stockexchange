@@ -13,6 +13,7 @@ import stockexchange.com.stockexchange.repository.StockRepository;
 import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.authentication.TokenHandlerService;
 import stockexchange.com.stockexchange.service.stockoperations.StockOperations;
+import stockexchange.com.stockexchange.utils.CacheUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,6 +45,10 @@ public class StockOperationsImpl implements StockOperations {
         } catch (TokenException e) {
             return returnInfoWhenTokenExceptionCatched(e);
         }
+        if (!checkIfUnitsAndPriceAreCorrectWhileBuying(stockDto)) {
+            return returnUnsucesfulInfo("Current price/units are not correct", APIInfoCodes.INCORECT_REQUEST);
+        }
+        ;
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         if (!checkIfUserHasEnoughMoney(user.getCash(), totalPrice)) {
             log.debug("Not enough cash to buy " + stockDto.getName() + " by " + user.getUsername());
@@ -54,6 +59,11 @@ public class StockOperationsImpl implements StockOperations {
         log.debug(stockDto.getUnit() + " " + stockDto.getName() + " bought by " + user.getUsername());
         userRepository.save(user);
         return returnSuccesfulInfo("Stock bought succesfuly");
+    }
+
+    private boolean checkIfUnitsAndPriceAreCorrectWhileBuying(StockDto stockDto) {
+        Stock cachedStock = (Stock) CacheUtil.getFromCache(stockDto.getCode());
+        return cachedStock.getUnit().equals(stockDto.getUnit()) && cachedStock.getPrice().compareTo(stockDto.getPrice()) <= 0;
     }
 
     private void addStockToUsersStocksWallet(User user, StockDto stockDto) {
@@ -110,6 +120,9 @@ public class StockOperationsImpl implements StockOperations {
             log.debug("Current stock is less than amount user: " + user.getUsername() + " wants to sell");
             return returnUnsucesfulInfo("Current stock is less than amount user wants to sell", APIInfoCodes.SOLD_OUT);
         }
+        if (!checkIfUnitsAndPriceAreCorrectWhileSelling(stockDto)) {
+            return returnUnsucesfulInfo("Current price/units are not correct", APIInfoCodes.INCORECT_REQUEST);
+        }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
         increaseCashAmount(user, totalPrice);
         decreaseStockUnitsHeld(user, stockDto);
@@ -161,6 +174,11 @@ public class StockOperationsImpl implements StockOperations {
         info.setHttpStatusCode(400L);
         info.setInfoCode(APIInfoCodes.SOLD_OUT);
         return info;
+    }
+
+    private boolean checkIfUnitsAndPriceAreCorrectWhileSelling(StockDto stockDto) {
+        Stock cachedStock = (Stock) CacheUtil.getFromCache(stockDto.getCode());
+        return cachedStock.getUnit().equals(stockDto.getUnit()) && cachedStock.getPrice().compareTo(stockDto.getPrice()) >= 0;
     }
 
 }

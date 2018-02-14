@@ -11,7 +11,8 @@ public enum APIInfoCodes {
     RELOGIN_NEEDED(400006L),
     TOKEN_NOT_FOUND(400007L),
     LACK_OF_CASH(400008L),
-    SOLD_OUT(400009L);
+    SOLD_OUT(400009L),
+    INCORECT_REQUEST(400010L);
 
     private long value;
 

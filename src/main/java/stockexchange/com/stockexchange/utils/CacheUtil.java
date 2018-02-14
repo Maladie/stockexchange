@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CacheUtil {
 
-    private static final int TIMEOUT_IN_SECONDS =600;
+    private static final int TIMEOUT_IN_SECONDS = 600;
     private static Logger logger = LogManager.getLogger(CacheUtil.class);
     private static ConcurrentMap<String, Object> concurrentMap;
     private static Cache<String, Object> cache;

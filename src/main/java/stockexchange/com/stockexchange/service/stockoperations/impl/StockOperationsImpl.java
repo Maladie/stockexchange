@@ -63,7 +63,7 @@ public class StockOperationsImpl implements StockOperations {
 
     private boolean checkIfUnitsAndPriceAreCorrectWhileBuying(StockDto stockDto) {
         Stock cachedStock = (Stock) CacheUtil.getFromCache(stockDto.getCode());
-        return cachedStock.getUnit().equals(stockDto.getUnit()) && cachedStock.getPrice().compareTo(stockDto.getPrice()) <= 0;
+        return cachedStock.getUnit().compareTo(stockDto.getUnit()) <= 0 && cachedStock.getPrice().compareTo(stockDto.getPrice()) <= 0;
     }
 
     private void addStockToUsersStocksWallet(User user, StockDto stockDto) {
@@ -178,7 +178,7 @@ public class StockOperationsImpl implements StockOperations {
 
     private boolean checkIfUnitsAndPriceAreCorrectWhileSelling(StockDto stockDto) {
         Stock cachedStock = (Stock) CacheUtil.getFromCache(stockDto.getCode());
-        return cachedStock.getUnit().equals(stockDto.getUnit()) && cachedStock.getPrice().compareTo(stockDto.getPrice()) >= 0;
+        return cachedStock.getUnit().compareTo(stockDto.getUnit()) >= 0 && cachedStock.getPrice().compareTo(stockDto.getPrice()) >= 0;
     }
 
 }

@@ -70,7 +70,7 @@ public class StockOperationsImpl implements StockOperations {
         Set<Stock> stocks = user.getStocks();
         Stock newStock = Stock.fromDto(stockDto);
         Optional<Stock> optionalStock = stocks.stream().filter(stock -> stock.getName().equals(newStock.getName())).findFirst();
-        if(optionalStock.isPresent()){
+        if (optionalStock.isPresent()) {
             Stock stock = optionalStock.get();
             updatePrice(stock, newStock);
             stockRepository.save(stock);
@@ -132,13 +132,18 @@ public class StockOperationsImpl implements StockOperations {
     }
 
     private boolean checkIfUserHasEnoughStock(Set<Stock> stocks, StockDto stockDto) {
-        Optional<Stock> optionalStock = stocks.stream().filter(stock -> stock.getName().equals(stockDto.getName())).findFirst();
-        return optionalStock.filter(stock -> stock.getUnit() > stockDto.getUnit()).isPresent();
+        Optional<Stock> optionalStock = stocks.stream().filter(stock -> stock.getCode().equals(stockDto.getCode())).findFirst();
+        if (optionalStock.isPresent()) {
+            Stock stock = optionalStock.get();
+            return stock.getUnit() >= stockDto.getUnit();
+        }
+        return false;
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void decreaseStockUnitsHeld(User user, StockDto stockDto) {
-        Set<Stock> stocks = user.getStocks();;
+        Set<Stock> stocks = user.getStocks();
+        ;
         Stock stock = stocks.stream().filter(stock1 -> stock1.getName().equals(stockDto.getName())).findFirst().get();
         stock.setUnit(stock.getUnit() - stockDto.getUnit());
         stockRepository.save(stock);

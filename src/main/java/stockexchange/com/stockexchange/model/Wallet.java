@@ -9,6 +9,8 @@ class Wallet {
     private String currency;
 
     Wallet() {
+        cash = new BigDecimal(0);
+        currency = "PLN";
     }
 
     public BigDecimal getCash() {

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Entity
+@Table(name = "clients")
 public class User implements UserDetails {
 
     @Id

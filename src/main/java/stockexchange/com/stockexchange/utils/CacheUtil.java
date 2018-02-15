@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import stockexchange.com.stockexchange.service.authentication.AsyncTokenExpire;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +58,10 @@ public class CacheUtil {
     public static void removeFromCache(String tag) {
         if (concurrentMap != null)
             concurrentMap.remove(tag);
+    }
+
+    public static Map<String, Object> getCache() {
+        return concurrentMap;
     }
 
     public static void cleanCache() {

@@ -99,4 +99,15 @@ public class Stock {
         stock.setUnit(stockDto.getUnit());
         return stock;
     }
+
+    @Override
+    public String toString() {
+        return "Stock{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", unit=" + unit +
+                ", price=" + price +
+                '}';
+    }
 }

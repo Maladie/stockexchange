@@ -24,7 +24,7 @@ public class StockFeed implements Runnable {
             items.forEach(stock -> CacheUtil.addToCache(stock.getCode(), stock));
             CacheUtil.addToCache("publicationDate", exchange.getBody().getPublicationDate());
             try {
-                Thread.sleep(10000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

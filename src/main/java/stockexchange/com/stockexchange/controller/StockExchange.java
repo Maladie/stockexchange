@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import stockexchange.com.stockexchange.config.Constants;
+import stockexchange.com.stockexchange.info.APIInfoCodes;
 import stockexchange.com.stockexchange.info.Info;
 import stockexchange.com.stockexchange.model.Stock;
 import stockexchange.com.stockexchange.model.StockDto;
@@ -39,12 +40,20 @@ public class StockExchange {
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
     public ResponseEntity<Info> buyStocks(@RequestBody StockDto stockDto, @RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
         Info info = stockOperations.buyStock(stockDto, token);
-        return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
+        if (info.getInfoCode().equals(APIInfoCodes.OK)) {
+            return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
+        }
+        ;
+        return new ResponseEntity<>(info, HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/sell", method = RequestMethod.POST)
     public ResponseEntity<Info> sellStocks(@RequestBody StockDto stockDto, @RequestHeader(Constants.HEADER_XSRF_AUTH_TOKEN) String token) {
         Info info = stockOperations.sellStock(stockDto, token);
-        return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
+        if (info.getInfoCode().equals(APIInfoCodes.OK)) {
+            return new ResponseEntity<>(info, HttpStatus.ACCEPTED);
+        }
+        ;
+        return new ResponseEntity<>(info, HttpStatus.BAD_REQUEST);
     }
 }

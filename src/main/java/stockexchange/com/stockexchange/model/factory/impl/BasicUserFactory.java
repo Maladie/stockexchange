@@ -7,6 +7,7 @@ import stockexchange.com.stockexchange.model.factory.UserFactory;
 import stockexchange.com.stockexchange.password.PasswordHasher;
 import stockexchange.com.stockexchange.password.SaltGenerator;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 @Component
@@ -18,8 +19,8 @@ public class BasicUserFactory implements UserFactory {
         newUser.setName(userDto.getName());
         newUser.setSurname(userDto.getSurname());
         newUser.setUsername(userDto.getUsername());
-        newUser.setCash(userDto.getCash());
-        newUser.setCurrency(userDto.getCurrency());
+        newUser.setCash(userDto.getCash() != null ? userDto.getCash() : new BigDecimal(0));
+        newUser.setCurrency(userDto.getCurrency() != null ? userDto.getCurrency() : "PLN");
         newUser.setStocks(Collections.emptySet());
         setUserPassword(newUser, userDto.getPassword());
         return newUser;

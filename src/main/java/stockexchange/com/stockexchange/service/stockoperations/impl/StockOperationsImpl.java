@@ -120,7 +120,7 @@ public class StockOperationsImpl implements StockOperations {
             log.debug("Current stock is less than amount user: " + user.getUsername() + " wants to sell");
             return returnUnsucesfulInfo("Current stock is less than amount user wants to sell", APIInfoCodes.SOLD_OUT);
         }
-        if (!checkIfUnitsAndPriceAreCorrectWhileSelling(stockDto)) {
+        if (!checkIfUnitsAndPriceAreCorrectWhileSelling(stockDto, user)) {
             return returnUnsucesfulInfo("Current price/units are not correct", APIInfoCodes.INCORECT_REQUEST);
         }
         BigDecimal totalPrice = stockDto.getPrice().multiply(new BigDecimal(stockDto.getUnit()));
@@ -176,9 +176,13 @@ public class StockOperationsImpl implements StockOperations {
         return info;
     }
 
-    private boolean checkIfUnitsAndPriceAreCorrectWhileSelling(StockDto stockDto) {
-        Stock cachedStock = (Stock) CacheUtil.getFromCache(stockDto.getCode());
-        return cachedStock.getUnit().compareTo(stockDto.getUnit()) <= 0 && cachedStock.getPrice().compareTo(stockDto.getPrice()) <= 0;
+    private boolean checkIfUnitsAndPriceAreCorrectWhileSelling(StockDto stockDto, User user) {
+        Optional<Stock> optionalStock = user.getStocks().stream().filter(stock -> stock.getCode().equals(stockDto.getCode())).findFirst();
+        if (optionalStock.isPresent()) {
+            Stock stock = optionalStock.get();
+            return stock.getUnit().compareTo(stockDto.getUnit()) >= 0 && stock.getPrice().compareTo(stockDto.getPrice()) == 0;
+        }
+        return false;
     }
 
 }

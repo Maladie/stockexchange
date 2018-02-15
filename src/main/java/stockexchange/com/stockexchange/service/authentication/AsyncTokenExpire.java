@@ -24,7 +24,7 @@ public class AsyncTokenExpire {
      */
     public static void expireToken(String expiredToken) {
         if (CacheUtil.getFromCache(expiredToken) instanceof User) {
-            logger.info("Token Expire Message Received ---> " + expiredToken);
+            logger.debug("Token Expire Message Received ---> " + expiredToken);
             User user = (User) CacheUtil.getFromCache(expiredToken);
             if (!EmptyCheck.isNullObject(user)) {
                 CacheUtil.removeFromCache(expiredToken);
@@ -34,7 +34,6 @@ public class AsyncTokenExpire {
                 if (user != null) {
                     userTokenRepository.updateUserTokenStatus(expiredToken, TokenStatus.EXPIRED_TIME, user.getId());
                 }
-
             logger.info(expiredToken + " is expired.");
         }
     }

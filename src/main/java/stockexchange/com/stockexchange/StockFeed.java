@@ -22,8 +22,9 @@ public class StockFeed implements Runnable {
             ResponseEntity<Stocks> exchange = restTemplate.exchange(resourceURL, HttpMethod.GET, entity, Stocks.class);
             Set<Stock> items = exchange.getBody().getItems();
             items.forEach(stock -> CacheUtil.addToCache(stock.getCode(), stock));
+            CacheUtil.addToCache("publicationDate", exchange.getBody().getPublicationDate());
             try {
-                Thread.sleep(30000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -10,6 +10,7 @@ import stockexchange.com.stockexchange.repository.UserRepository;
 import stockexchange.com.stockexchange.service.authentication.TokenHandlerService;
 import stockexchange.com.stockexchange.service.user.UserStockService;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
 
@@ -37,5 +38,17 @@ public class UserStockServiceImpl implements UserStockService {
             log.debug("Token not found", e);
         }
         return user != null ? user.getStocks() : Collections.emptySet();
+    }
+
+    @Override
+    public BigDecimal getCash(String token) {
+        User user = null;
+        try {
+            user = tokenHandlerService.parseUserFromToken(token);
+            user = userRepository.findById(user.getId());
+        } catch (TokenException e) {
+            log.debug("Token not found", e);
+        }
+        return user != null ? user.getCash() : new BigDecimal(0);
     }
 }

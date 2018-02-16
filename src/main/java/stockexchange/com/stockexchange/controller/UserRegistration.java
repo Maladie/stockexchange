@@ -22,6 +22,11 @@ public class UserRegistration {
         this.registerUserService = registerUserService;
     }
 
+    @RequestMapping(value = "/*", method = RequestMethod.OPTIONS)
+    public String test() {
+        return "Option request method not implemented";
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<Info> registerNewUser(@RequestBody NewUserDto newUserDto){
         Info result = registerUserService.register(newUserDto);
